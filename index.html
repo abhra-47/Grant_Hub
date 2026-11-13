@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GrantFinder — Describe your idea. Get your grants.</title>
+<meta name="description" content="Type your startup idea and get matched grants, fellowships, accelerators and prizes from 185 programmes for young Indian founders. No sign-up, matching runs in your browser.">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .chip.active{background:#111827;color:#fff;border-color:#111827}
+  .card{transition:transform .12s ease,box-shadow .12s ease}
+  .card:hover{transform:translateY(-2px);box-shadow:0 10px 25px rgba(0,0,0,.10)}
+  .line-clamp-2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .line-clamp-3{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .example-chip:hover{background:#ecfdf5;border-color:#10b981}
+</style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+
+<header class="bg-slate-900 text-white">
+  <div class="max-w-7xl mx-auto px-4 py-10 sm:py-12">
+    <p class="text-emerald-400 font-semibold tracking-wide text-sm uppercase">For young Indian founders · 18–35</p>
+    <h1 class="text-3xl sm:text-5xl font-extrabold mt-2 leading-tight">GrantFinder</h1>
+    <p class="text-lg sm:text-xl text-slate-300 mt-2 max-w-3xl">Describe your idea. Get your grants. — 185 grants, fellowships, accelerators, prizes &amp; scholarships, matched to your startup idea in seconds. Built from Abhrajyoti's 170+ programme research.</p>
+    <div id="stats" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-8">
+      <div class="bg-slate-800 rounded-xl p-4"><p class="text-3xl font-bold" id="stat-total">—</p><p class="text-slate-400 text-sm">Total programs</p></div>
+      <div class="bg-slate-800 rounded-xl p-4"><p class="text-3xl font-bold text-emerald-400" id="stat-india">—</p><p class="text-slate-400 text-sm">India-eligible</p></div>
+      <div class="bg-slate-800 rounded-xl p-4"><p class="text-3xl font-bold text-amber-400" id="stat-rolling">—</p><p class="text-slate-400 text-sm">Rolling / open now</p></div>
+      <div class="bg-slate-800 rounded-xl p-4"><p class="text-3xl font-bold text-sky-400" id="stat-gems">—</p><p class="text-slate-400 text-sm">Hidden gems</p></div>
+    </div>
+    <p class="text-slate-400 text-sm mt-4">⚠️ Data researched <strong class="text-slate-200">2026-09-25</strong>. Many deadlines are unverified and 2026 cycles have closed — always verify amount, eligibility &amp; deadline on the official site before applying.</p>
+  </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-4 py-6">
+  <div id="file-warning" class="hidden bg-amber-50 border border-amber-300 text-amber-900 rounded-xl p-4 mb-4 text-sm">
+    <strong>Opened via file:// ?</strong> This page loads <code>grants.json</code> with <code>fetch()</code>, which browsers block from <code>file://</code>. Serve it locally (<code>python3 -m http.server</code> in this folder) or deploy to GitHub Pages — see README.md.
+  </div>
+
+  <!-- Closing soon / open now -->
+  <section id="closing-strip" class="mb-6 hidden">
+    <h2 class="text-lg font-bold mb-2">🔥 Closing soon / open now <span class="text-slate-500 font-normal text-sm">— dated deadlines named in the research files</span></h2>
+    <div id="closing-list" class="flex gap-3 overflow-x-auto pb-2"></div>
+  </section>
+
+  <!-- ============ IDEA MATCHER ============ -->
+  <section class="bg-white rounded-2xl shadow-sm border p-4 sm:p-6">
+    <h2 class="text-xl sm:text-2xl font-bold">💡 Find grants for your idea</h2>
+    <p class="text-sm text-slate-600 mt-1">Type your idea in plain words — the matcher scores all 185 programmes against it. No sign-up, no server: matching runs entirely in your browser.</p>
+
+    <textarea id="m-idea" rows="3" placeholder="Describe your startup idea in 1–3 sentences… e.g. affordable autotitrator for college labs" class="w-full border rounded-xl px-4 py-3 text-base mt-4 focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+
+    <div class="flex flex-wrap gap-3 mt-3 items-center">
+      <label class="text-sm font-medium">Stage:
+        <select id="m-stage" class="border rounded-lg px-3 py-2 text-sm bg-white ml-1">
+          <option value="idea">Just an idea</option>
+          <option value="prototype">Prototype built</option>
+          <option value="mvp">MVP / pilot running</option>
+          <option value="revenue">Has revenue</option>
+        </select>
+      </label>
+      <label class="inline-flex items-center gap-2 border rounded-lg px-3 py-2 text-sm cursor-pointer"><input id="m-india" type="checkbox" checked class="accent-emerald-600"> 🇮🇳 India-based</label>
+      <button id="m-run" class="bg-emerald-600 text-white rounded-lg px-5 py-2.5 font-bold hover:bg-emerald-700">Find my grants →</button>
+    </div>
+
+    <div class="mt-4">
+      <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Try an example — tap to fill &amp; run:</p>
+      <div class="flex flex-wrap gap-2 mt-2">
+        <button class="example-chip border rounded-full px-3 py-1.5 text-sm text-left" data-idea="Affordable autotitrator for college and pharma QC labs in India" data-stage="idea">🧪 Affordable autotitrator for college &amp; pharma QC labs</button>
+        <button class="example-chip border rounded-full px-3 py-1.5 text-sm text-left" data-idea="Free sanitary pads for school girls in India, funded by ads on the pack" data-stage="idea">🩸 Free sanitary pads for school girls, funded by ads</button>
+        <button class="example-chip border rounded-full px-3 py-1.5 text-sm text-left" data-idea="AI tutor app that helps Indian students study faster and earn on the side" data-stage="idea">🤖 AI tutor app for Indian students</button>
+        <button class="example-chip border rounded-full px-3 py-1.5 text-sm text-left" data-idea="Low-cost solar cold storage for small farmers to stop food waste" data-stage="idea">☀️ Low-cost solar cold storage for small farmers</button>
+        <button class="example-chip border rounded-full px-3 py-1.5 text-sm text-left" data-idea="App that helps young couples plan cheap, fun dates in their city" data-stage="idea">💑 App for young couples to plan cheap, fun dates</button>
+      </div>
+    </div>
+
+    <details class="mt-4 text-sm text-slate-600">
+      <summary class="cursor-pointer font-semibold text-slate-800">How matching works</summary>
+      <div class="mt-2 space-y-1 pl-1">
+        <p>Your idea is lowercased, split into words, stopwords removed (<em>a, the, for, …</em>), and lightly stemmed (<em>farmers → farmer</em>). A few synonyms are expanded — e.g. <em>autotitrator → lab, device, diagnostic</em>, <em>pads → sanitary, menstrual, hygiene</em>, <em>tutor → education, student</em>.</p>
+        <p>Each programme is then scored:</p>
+        <ul class="list-disc pl-5">
+          <li><strong>+5</strong> if a word matches a word in the programme's name</li>
+          <li><strong>+3</strong> if a word matches one of the programme's keywords</li>
+          <li><strong>+2</strong> if a word appears in its eligibility text</li>
+          <li><strong>+2</strong> India bonus if you're India-based and the programme is India-eligible; <strong>−5</strong> if it's explicitly not India-eligible</li>
+          <li><strong>+2</strong> if the stage fits (exact stage; +1 for the adjacent early stage, e.g. an idea-stage founder eyeing a prototype grant)</li>
+          <li><strong>+2</strong> baseline for open-topic programmes (any domain / anyone / any sector) so a vague idea still returns something</li>
+          <li><strong>+1</strong> tie-breaker for Hidden Gems and Top Picks</li>
+        </ul>
+        <p>Match % = your score ÷ the best score in this run × 100. <strong>≥70% Strong match · 40–69% Good match · &lt;40% Worth a look.</strong> If nothing scores, open-topic programmes sorted by amount are shown instead. Keywords for all 185 programmes were generated by <code>enrich.py</code> from the research files — see README.md. Two deliberate guards: "india" never scores via name/keywords (it would swamp every domain signal — the India bonus handles it), and generic name words like <em>lab, student, university, fellowship</em> don't earn the +5 name bonus.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ MATCH RESULTS ============ -->
+  <section id="results" class="hidden mt-6">
+    <div class="flex flex-wrap items-baseline gap-3">
+      <h2 class="text-xl font-bold">🎯 Matches for your idea</h2>
+      <p id="match-count" class="text-sm text-slate-500"></p>
+    </div>
+    <div id="low-note" class="hidden bg-amber-50 border border-amber-300 rounded-xl p-4 mt-3 text-sm">
+      <p><strong>No exact domain match?</strong> Your idea doesn't line up closely with any one domain in the database — that's normal for a new idea. These open-topic grants fund almost anything:</p>
+      <div id="low-list" class="flex flex-wrap gap-2 mt-3"></div>
+    </div>
+    <div id="match-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4"></div>
+    <div class="text-center mt-4">
+      <button id="match-more" class="hidden border rounded-lg px-4 py-2 text-sm hover:bg-white">Show all matches</button>
+    </div>
+  </section>
+
+  <!-- ============ BROWSE ALL ============ -->
+  <section class="mt-10">
+    <h2 class="text-xl font-bold mb-3">📚 Browse all <span id="browse-total">185</span> programs</h2>
+    <div class="bg-white rounded-2xl shadow-sm border p-4 sm:p-5 sticky top-2 z-20">
+      <input id="search" type="search" placeholder="Search name, org, eligibility, category… e.g. Thiel, biotech, SINE, climate" class="w-full border rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500">
+      <div class="flex flex-wrap gap-2 mt-3 items-center">
+        <select id="f-category" class="border rounded-lg px-3 py-2 text-sm bg-white"><option value="">All categories</option></select>
+        <select id="f-type" class="border rounded-lg px-3 py-2 text-sm bg-white"><option value="">All types</option></select>
+        <select id="f-deadline" class="border rounded-lg px-3 py-2 text-sm bg-white">
+          <option value="">Any deadline status</option>
+          <option value="open-now">Open now</option><option value="rolling">Rolling</option>
+          <option value="dated">Dated</option><option value="unverified">Unverified</option><option value="closed">Closed</option>
+        </select>
+        <select id="f-size" class="border rounded-lg px-3 py-2 text-sm bg-white">
+          <option value="">Any funding size</option>
+          <option value="micro">Micro &lt; $5k</option><option value="small">Small $5k–$25k</option>
+          <option value="mid">Mid $25k–$100k</option>
+          <option value="large">Large $100k+</option>
+          <option value="unknown">Amount not parsed</option>
+        </select>
+        <select id="f-sort" class="border rounded-lg px-3 py-2 text-sm bg-white">
+          <option value="amount">Sort: Amount (high → low)</option>
+          <option value="name">Sort: Name A–Z</option>
+          <option value="deadline">Sort: Open now first</option>
+        </select>
+        <label class="inline-flex items-center gap-2 border rounded-lg px-3 py-2 text-sm cursor-pointer"><input id="f-india" type="checkbox" class="accent-emerald-600"> 🇮🇳 India-eligible only</label>
+        <label class="inline-flex items-center gap-2 border rounded-lg px-3 py-2 text-sm cursor-pointer"><input id="f-gems" type="checkbox" class="accent-sky-600"> 💎 Hidden gems only</label>
+        <label class="inline-flex items-center gap-2 border rounded-lg px-3 py-2 text-sm cursor-pointer"><input id="f-top" type="checkbox" class="accent-amber-500"> ⭐ Top Picks only</label>
+        <button id="f-reset" class="border rounded-lg px-3 py-2 text-sm hover:bg-slate-100">Reset</button>
+      </div>
+      <div id="category-chips" class="flex flex-wrap gap-2 mt-3"></div>
+      <p id="result-count" class="text-sm text-slate-500 mt-3"></p>
+    </div>
+    <section id="browse-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6"></section>
+    <p id="browse-empty" class="hidden text-center text-slate-500 py-12">No programs match those filters. Try clearing the search or a filter.</p>
+  </section>
+
+  <!-- Add a grant -->
+  <section class="bg-white rounded-2xl shadow-sm border p-5 mt-10">
+    <h2 class="text-xl font-bold">➕ Add a grant</h2>
+    <p class="text-sm text-slate-600 mt-1">No backend — fill this in, copy the JSON snippet, and paste it into <code>grants.json</code> (or send it as a pull request / issue on GitHub). Fields marked * are required. Keywords are optional here — run <code>python3 enrich.py</code> afterwards and it will generate them from your text.</p>
+    <div class="grid sm:grid-cols-2 gap-3 mt-4">
+      <input id="a-name" placeholder="Program name *" class="border rounded-lg px-3 py-2">
+      <input id="a-org" placeholder="Organisation *" class="border rounded-lg px-3 py-2">
+      <input id="a-category" placeholder="Category — e.g. Climate & Environment" class="border rounded-lg px-3 py-2">
+      <select id="a-type" class="border rounded-lg px-3 py-2 bg-white"><option>Grant</option><option>Fellowship</option><option>Accelerator</option><option>Prize</option><option>Competition</option><option>Scholarship</option><option>Credits</option></select>
+      <input id="a-funding" placeholder="Funding — e.g. $10,000" class="border rounded-lg px-3 py-2">
+      <input id="a-amount" type="number" placeholder="Amount in USD (approx, numbers only)" class="border rounded-lg px-3 py-2">
+      <input id="a-deadline" placeholder="Deadline — e.g. Rolling / Dec 15, 2026" class="border rounded-lg px-3 py-2">
+      <input id="a-url" placeholder="Official URL — copy verbatim, leave blank if unverified" class="border rounded-lg px-3 py-2">
+      <textarea id="a-elig" placeholder="Eligibility (1–2 lines)" class="border rounded-lg px-3 py-2 sm:col-span-2" rows="2"></textarea>
+      <textarea id="a-why" placeholder="Why it's easy / low-competition (optional)" class="border rounded-lg px-3 py-2 sm:col-span-2" rows="2"></textarea>
+      <input id="a-keywords" placeholder="Keywords, comma-separated (optional — e.g. solar, farmer, cold storage)" class="border rounded-lg px-3 py-2 sm:col-span-2">
+    </div>
+    <div class="flex gap-2 mt-4">
+      <button id="a-generate" class="bg-emerald-600 text-white rounded-lg px-4 py-2 font-semibold hover:bg-emerald-700">Generate JSON snippet</button>
+      <button id="a-copy" class="border rounded-lg px-4 py-2 hover:bg-slate-100">Copy snippet</button>
+    </div>
+    <pre id="a-output" class="bg-slate-900 text-emerald-200 text-xs rounded-xl p-4 mt-4 overflow-x-auto whitespace-pre-wrap hidden"></pre>
+    <p class="text-xs text-slate-500 mt-3">To add it permanently: open <code>grants.json</code>, add the object to the array (keep it valid JSON — check with <code>python3 -m json.tool grants.json</code>), commit and push. GitHub Pages redeploys automatically.</p>
+  </section>
+</main>
+
+<footer class="max-w-7xl mx-auto px-4 pb-10 text-sm text-slate-500">
+  <hr class="my-6">
+  <p><strong>Data source:</strong> Abhrajyoti's research, <code>global-fellowships-grants-young-founders.md</code> (350 lines, 15 domains, Top Picks 1–16) and <code>hidden-gems-easy-grants-young-founders.md</code> (553 lines, hidden gems / low-competition), both researched <strong>2026-09-25</strong>. Built from 170+ programmes. No URLs, amounts or deadlines were invented — where the files had none, the site says “URL unverified — search name” / “Verify on official site”.</p>
+  <p class="mt-2">Funding in USD is an approximate conversion (₹ ÷ 88, £ × 1.34, € × 1.17) for sorting / bucketing only — the verbatim funding text on each card is the source of truth. <a class="underline" href="https://github.com/">Deploy: see README.md</a></p>
+</footer>
+
+<!-- Modal -->
+<div id="modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-start sm:items-center justify-center p-4" role="dialog" aria-modal="true">
+  <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6">
+    <div class="flex justify-between items-start gap-4"><h3 id="m-name" class="text-2xl font-bold"></h3><button id="m-close" class="text-2xl leading-none px-2" aria-label="Close">×</button></div>
+    <p id="m-org" class="text-slate-600"></p>
+    <div id="m-badges" class="flex flex-wrap gap-2 mt-3"></div>
+    <div id="m-match" class="hidden mt-3 bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-sm"></div>
+    <dl class="mt-4 space-y-3 text-sm">
+      <div><dt class="font-semibold">Funding</dt><dd id="m-funding"></dd></div>
+      <div><dt class="font-semibold">Eligibility</dt><dd id="m-elig"></dd></div>
+      <div><dt class="font-semibold">Deadline</dt><dd id="m-deadline"></dd></div>
+      <div id="m-why-wrap"><dt class="font-semibold">Why it's easy / low-competition</dt><dd id="m-why"></dd></div>
+      <div><dt class="font-semibold">Keywords</dt><dd id="m-keywords" class="text-slate-600"></dd></div>
+      <div><dt class="font-semibold">Source file</dt><dd id="m-source" class="text-slate-500"></dd></div>
+    </dl>
+    <div id="m-apply" class="mt-5"></div>
+  </div>
+</div>
+
+<script>
+let ALL = [];
+let LAST_MATCH = {}; // grant id -> {pct, matched, verdict}
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmtUSD = n => n == null ? '—' : '$' + Number(n).toLocaleString('en-US');
+const badge = (txt, cls) => `<span class="text-xs font-semibold px-2 py-0.5 rounded-full ${cls}">${esc(txt)}</span>`;
+const catBadge = c => badge(c, 'bg-slate-100 text-slate-700');
+const typeBadge = t => badge(t, 'bg-indigo-100 text-indigo-800');
+const indiaBadge = v => v === true ? badge('🇮🇳 India-eligible', 'bg-emerald-100 text-emerald-800') : v === false ? badge('Not India-eligible', 'bg-red-100 text-red-800') : badge('India: unknown', 'bg-slate-100 text-slate-600');
+const statusBadge = s => ({'open-now':badge('● Open now','bg-emerald-600 text-white'),'rolling':badge('Rolling','bg-sky-100 text-sky-800'),'dated':badge('Dated deadline','bg-amber-100 text-amber-800'),'unverified':badge('Deadline unverified','bg-slate-100 text-slate-600'),'closed':badge('Closed','bg-red-100 text-red-800')})[s] || '';
+const verdictFor = pct => pct >= 70 ? 'Strong match' : pct >= 40 ? 'Good match' : 'Worth a look';
+const verdictBadge = pct => pct >= 70
+  ? badge(`🎯 ${pct}% · Strong match`, 'bg-emerald-600 text-white')
+  : pct >= 40 ? badge(`🎯 ${pct}% · Good match`, 'bg-amber-100 text-amber-800')
+  : badge(`🎯 ${pct}% · Worth a look`, 'bg-slate-100 text-slate-600');
+
+/* ================= IDEA MATCHER (mirrors test_matcher.py — keep in sync) ================= */
+const STOPWORDS = new Set(['a','an','the','for','and','to','of','in','on','with','my','our','is','are','be','by','at','from','that','this','it','as','or','we','you','your','their','his','her','its','i','am','if','so','but','not','no','do','does','will','can','help','helps','helping','make','makes','get','gets','give','gives','one','two','new','more','all','any','per','free','plan','small','young','fun','side','stop','earn','faster']);
+const INDIA_TOKENS = new Set(['india','indian']);
+const NAME_GENERIC = new Set(['india','indian','lab','youth','global','foundation','fellowship','grant','prize','challenge','program','programme','project','fund','award','competition','accelerator','incubator','forum','network','centre','center','initiative','scheme','student','university','college','school']);
+const SYNONYMS = {
+  autotitrator: ['lab','laboratory','device','instrument','chemistry','diagnostic'],
+  titrator: ['lab','device','instrument','chemistry'],
+  pads: ['sanitary','menstrual','hygiene','sanitation'],
+  pad: ['sanitary','menstrual','hygiene','sanitation'],
+  sanitary: ['menstrual','hygiene'],
+  menstrual: ['sanitary','hygiene'],
+  tutor: ['education','learning','student','teaching'],
+  tutoring: ['education','learning','student'],
+  cold: ['storage','solar','energy','food'],
+  farmer: ['agriculture','farm','food','rural'],
+  farmers: ['agriculture','farm','food','rural'],
+  dating: ['couples','relationship','date'],
+  dates: ['couples','relationship','date'],
+  couples: ['dating','relationship','date'],
+  couple: ['dating','relationship','date'],
+  school: ['student'],
+  college: ['student'],
+  girls: ['women','gender','school'],
+  girl: ['women','gender','school'],
+  app: ['software','platform','mobile'],
+  ai: ['artificial','intelligence','machine','learning'],
+  solar: ['clean','energy','renewable','climate'],
+  affordable: ['low','cost','cheap'],
+  cheap: ['low','cost','affordable']
+};
+function stem(w){
+  if (w.length > 5 && w.endsWith('ing')) return w.slice(0,-3);
+  if (w.length > 4 && w.endsWith('es')) return w.slice(0,-2);
+  if (w.length > 3 && w.endsWith('s') && !w.endsWith('ss')) return w.slice(0,-1);
+  return w;
+}
+function tokenize(text){
+  const words = (text.toLowerCase().match(/[a-z0-9]+/g) || []);
+  const out = [];
+  const push = t => { if (t && !out.includes(t)) out.push(t); };
+  for (const w of words){
+    if (STOPWORDS.has(w)) continue;
+    push(stem(w));
+    for (const s of (SYNONYMS[w] || [])) push(stem(s));
+  }
+  return out;
+}
+function stageFits(g, stage){
+  const text = (((g.eligibility || '') + ' ' + (g.funding_text || '')).toLowerCase());
+  const kws = (g.keywords || []).map(k => k.toLowerCase());
+  const ideaish = kws.includes('idea-stage') || text.includes('idea') || text.includes('no prototype');
+  const protoish = kws.includes('prototype') || text.includes('prototype') || text.includes('mvp');
+  if (stage === 'idea') return ideaish ? 2 : protoish ? 1 : 0;
+  if (stage === 'prototype' || stage === 'mvp') return protoish ? 2 : ideaish ? 1 : 0;
+  return 0;
+}
+function isOpenTopic(g){
+  const elig = (g.eligibility || '').toLowerCase();
+  return g.category === 'General / Multi-domain' || elig.includes('any domain') || elig.includes('anyone') || elig.includes('any sector');
+}
+function scoreGrant(g, tokens, stage, indiaOn, mentionsIndia){
+  const words = t => (t.toLowerCase().match(/[a-z0-9]+/g) || []).map(stem);
+  const nameWords = new Set(words(g.name));
+  const eligWords = new Set(words(g.eligibility || ''));
+  const kwStems = new Set();
+  (g.keywords || []).forEach(kw => words(kw).forEach(w => kwStems.add(w)));
+  let s = 0; const matched = [];
+  for (const t of tokens){
+    if (INDIA_TOKENS.has(t)) continue; // handled by the India bonus below
+    let hit = false;
+    if (!NAME_GENERIC.has(t) && nameWords.has(t)){ s += 5; hit = true; }
+    if (kwStems.has(t)){ s += 3; hit = true; }
+    if (eligWords.has(t)){ s += 2; hit = true; }
+    if (hit) matched.push(t);
+  }
+  if (isOpenTopic(g)) s += 2;
+  if (indiaOn || mentionsIndia){
+    if (g.india_eligible === true) s += 2;
+    else if (g.india_eligible === false) s -= 5;
+  }
+  if (stage) s += stageFits(g, stage);
+  if (g.is_hidden_gem || g.is_top_pick) s += 1;
+  return {score: s, matched};
+}
+function matchIdea(idea, stage, indiaOn){
+  const tokens = tokenize(idea);
+  const mentionsIndia = tokens.includes('india') || tokens.includes('indian');
+  const scored = ALL.map(g => {
+    const r = scoreGrant(g, tokens, stage, indiaOn, mentionsIndia);
+    return {g, score: r.score, matched: r.matched};
+  });
+  const maxScore = Math.max(0, ...scored.map(x => x.score));
+  if (maxScore <= 0){
+    const gen = ALL.filter(isOpenTopic).slice().sort((a,b) => (b.funding_amount_usd ?? -1) - (a.funding_amount_usd ?? -1)).slice(0, 12);
+    return {tokens, maxScore: 0, results: gen.map(g => ({g, score: 0, pct: 0, matched: []})), fallback: true};
+  }
+  const results = scored.filter(x => x.score > 0)
+    .sort((a,b) => (b.score - a.score) || ((b.g.funding_amount_usd ?? -1) - (a.g.funding_amount_usd ?? -1)))
+    .map(x => ({g: x.g, score: x.score, pct: Math.round(100 * x.score / maxScore), matched: x.matched}));
+  return {tokens, maxScore, results, fallback: false};
+}
+
+/* ================= CARDS ================= */
+function sizeBucket(g){
+  const a = g.funding_amount_usd;
+  if (a == null) return 'unknown';
+  if (a < 5000) return 'micro';
+  if (a < 25000) return 'small';
+  if (a < 100000) return 'mid';
+  return 'large';
+}
+function applyLink(g){
+  if (g.url) return `<a href="${esc(g.url)}" target="_blank" rel="noopener" class="inline-block bg-emerald-600 text-white rounded-lg px-4 py-2 font-semibold hover:bg-emerald-700">Apply ↗</a>`;
+  return `<span class="inline-block bg-slate-100 text-slate-600 rounded-lg px-4 py-2 text-sm">URL unverified — search “${esc(g.name)}”</span>`;
+}
+function card(g, match){
+  const badges = [catBadge(g.category), typeBadge(g.type), indiaBadge(g.india_eligible), statusBadge(g.deadline_status)];
+  if (g.is_top_pick) badges.push(badge('⭐ Top Pick','bg-amber-100 text-amber-800'));
+  if (g.is_hidden_gem) badges.push(badge('💎 Hidden Gem','bg-sky-100 text-sky-800'));
+  if (g.is_quick_win) badges.push(badge('⚡ Quick Win','bg-emerald-100 text-emerald-800'));
+  const matchHtml = match ? `
+    <div class="flex flex-wrap items-center gap-2 mt-3">${verdictBadge(match.pct)}</div>
+    ${match.matched.length ? `<p class="text-xs text-emerald-800 bg-emerald-50 rounded-lg px-2 py-1 mt-2">Matched: ${match.matched.map(esc).join(', ')}</p>` : ''}` : '';
+  return `<article class="card bg-white rounded-2xl border shadow-sm p-5 flex flex-col cursor-pointer" data-id="${esc(g.id)}" tabindex="0">
+    <div class="flex flex-wrap gap-1.5">${badges.join('')}</div>
+    <h3 class="font-bold text-lg mt-3 leading-snug">${esc(g.name)}</h3>
+    <p class="text-sm text-slate-500">${esc(g.org || '')}</p>
+    ${matchHtml}
+    <p class="text-2xl font-extrabold mt-3">${esc(g.funding_text || 'Verify on official site')}</p>
+    <p class="text-xs text-slate-500">${g.funding_amount_usd != null ? '≈ ' + fmtUSD(g.funding_amount_usd) + ' for sorting' : 'Amount not parsed'}</p>
+    <p class="text-sm text-slate-700 mt-3 line-clamp-3">${esc(g.eligibility || '')}</p>
+    <p class="text-sm mt-2"><span class="font-semibold">Deadline:</span> ${esc(g.deadline_text || 'Verify on official site')}</p>
+    ${g.why_easy ? `<p class="text-sm text-sky-800 bg-sky-50 rounded-lg p-2 mt-3 line-clamp-2">💎 ${esc(g.why_easy)}</p>` : ''}
+    <div class="mt-auto pt-4">${applyLink(g)}</div>
+  </article>`;
+}
+function wireCards(containerId){
+  document.querySelectorAll('#' + containerId + ' .card').forEach(el => {
+    el.addEventListener('click', e => { if (e.target.closest('a')) return; openModal(el.dataset.id); });
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') openModal(el.dataset.id); });
+  });
+}
+
+/* ================= MATCH RESULTS UI ================= */
+let MATCH_RESULTS = [];
+function runMatcher(){
+  const idea = $('m-idea').value.trim();
+  if (!idea){ $('m-idea').focus(); $('m-idea').classList.add('ring-2','ring-red-400'); setTimeout(() => $('m-idea').classList.remove('ring-2','ring-red-400'), 1200); return; }
+  const stage = $('m-stage').value;
+  const indiaOn = $('m-india').checked;
+  const {maxScore, results, fallback} = matchIdea(idea, stage, indiaOn);
+  MATCH_RESULTS = results;
+  LAST_MATCH = {};
+  results.forEach(r => { LAST_MATCH[r.g.id] = {pct: r.pct, matched: r.matched, verdict: verdictFor(r.pct)}; });
+  $('results').classList.remove('hidden');
+  $('match-count').textContent = fallback
+    ? `No scored match — showing ${results.length} open-topic programmes by amount instead`
+    : `${results.length} match${results.length === 1 ? '' : 'es'} for your idea · best score ${maxScore}`;
+  const low = !fallback && maxScore < 12;
+  $('low-note').classList.toggle('hidden', !low);
+  if (low){
+    const open = ALL.filter(isOpenTopic).slice().sort((a,b) => (b.funding_amount_usd ?? -1) - (a.funding_amount_usd ?? -1)).slice(0, 3);
+    $('low-list').innerHTML = open.map(g =>
+      `<button class="text-left bg-white border rounded-xl px-3 py-2 text-sm hover:shadow" data-id="${esc(g.id)}"><span class="font-bold">${esc(g.name)}</span> <span class="text-slate-500">— ${esc(g.funding_text || '')}</span></button>`).join('');
+    document.querySelectorAll('#low-list button').forEach(b => b.addEventListener('click', () => openModal(b.dataset.id)));
+  }
+  renderMatches(false);
+  $('results').scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+function renderMatches(showAll){
+  const list = showAll ? MATCH_RESULTS : MATCH_RESULTS.slice(0, 12);
+  $('match-grid').innerHTML = list.map(r => card(r.g, {pct: r.pct, matched: r.matched})).join('') ||
+    `<p class="bg-white border rounded-xl p-6 text-sm col-span-full">No programmes scored for this idea. Try adding a domain word (e.g. health, climate, solar, education) or a place (India).</p>`;
+  $('match-more').classList.toggle('hidden', MATCH_RESULTS.length <= 12);
+  $('match-more').textContent = showAll ? 'Show fewer' : `Show all ${MATCH_RESULTS.length} matches`;
+  $('match-more').onclick = () => renderMatches(!showAll);
+  wireCards('match-grid');
+}
+$('m-run').addEventListener('click', runMatcher);
+$('m-idea').addEventListener('keydown', e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) runMatcher(); });
+document.querySelectorAll('.example-chip').forEach(b => b.addEventListener('click', () => {
+  $('m-idea').value = b.dataset.idea;
+  $('m-stage').value = b.dataset.stage || 'idea';
+  runMatcher();
+}));
+
+/* ================= BROWSE ALL ================= */
+function getFilters(){
+  return {
+    q: $('search').value.trim().toLowerCase(),
+    cat: $('f-category').value, type: $('f-type').value, deadline: $('f-deadline').value,
+    size: $('f-size').value, sort: $('f-sort').value,
+    india: $('f-india').checked, gems: $('f-gems').checked, top: $('f-top').checked
+  };
+}
+function filtered(){
+  const f = getFilters();
+  let list = ALL.filter(g => {
+    if (f.q && ![g.name, g.org, g.eligibility, g.category, g.type, (g.keywords || []).join(' ')].join(' ').toLowerCase().includes(f.q)) return false;
+    if (f.cat && g.category !== f.cat) return false;
+    if (f.type && g.type !== f.type) return false;
+    if (f.deadline && g.deadline_status !== f.deadline) return false;
+    if (f.size && sizeBucket(g) !== f.size) return false;
+    if (f.india && g.india_eligible !== true) return false;
+    if (f.gems && !g.is_hidden_gem) return false;
+    if (f.top && !g.is_top_pick) return false;
+    return true;
+  });
+  const rank = {'open-now':0,'rolling':1,'dated':2,'unverified':3,'closed':4};
+  if (f.sort === 'amount') list.sort((a,b) => (b.funding_amount_usd ?? -1) - (a.funding_amount_usd ?? -1));
+  else if (f.sort === 'name') list.sort((a,b) => a.name.localeCompare(b.name));
+  else list.sort((a,b) => (rank[a.deadline_status] ?? 9) - (rank[b.deadline_status] ?? 9) || (b.funding_amount_usd ?? -1) - (a.funding_amount_usd ?? -1));
+  return list;
+}
+function renderBrowse(){
+  const list = filtered();
+  $('browse-grid').innerHTML = list.map(g => card(g, null)).join('');
+  $('browse-empty').classList.toggle('hidden', list.length > 0);
+  $('result-count').textContent = `Showing ${list.length} of ${ALL.length} programs`;
+  wireCards('browse-grid');
+}
+['search','f-category','f-type','f-deadline','f-size','f-sort','f-india','f-gems','f-top'].forEach(id => $(id).addEventListener('input', renderBrowse));
+$('f-reset').addEventListener('click', () => {
+  $('search').value=''; $('f-category').value=''; $('f-type').value=''; $('f-deadline').value=''; $('f-size').value=''; $('f-sort').value='amount';
+  $('f-india').checked=false; $('f-gems').checked=false; $('f-top').checked=false;
+  document.querySelectorAll('#category-chips .chip').forEach(x => x.classList.remove('active')); renderBrowse();
+});
+
+/* ================= MODAL ================= */
+function openModal(id){
+  const g = ALL.find(x => x.id === id); if (!g) return;
+  $('m-name').textContent = g.name; $('m-org').textContent = g.org || '';
+  $('m-badges').innerHTML = [catBadge(g.category), typeBadge(g.type), indiaBadge(g.india_eligible), statusBadge(g.deadline_status),
+    g.is_top_pick ? badge('⭐ Top Pick','bg-amber-100 text-amber-800') : '',
+    g.is_hidden_gem ? badge('💎 Hidden Gem','bg-sky-100 text-sky-800') : '',
+    g.is_quick_win ? badge('⚡ Quick Win','bg-emerald-100 text-emerald-800') : ''].join('');
+  const m = LAST_MATCH[id];
+  $('m-match').classList.toggle('hidden', !m);
+  if (m) $('m-match').innerHTML = `<strong>${esc(m.verdict)} — ${m.pct}% match for your idea.</strong>` +
+    (m.matched.length ? `<br>Matched words: ${m.matched.map(esc).join(', ')}` : '');
+  $('m-funding').textContent = (g.funding_text || 'Verify on official site') + (g.funding_amount_usd != null ? `  (≈ ${fmtUSD(g.funding_amount_usd)})` : '');
+  $('m-elig').textContent = g.eligibility || 'Verify on official site';
+  $('m-deadline').textContent = `${g.deadline_text || 'Verify on official site'}  (status: ${g.deadline_status})`;
+  $('m-why-wrap').style.display = g.why_easy ? '' : 'none';
+  $('m-why').textContent = g.why_easy || '';
+  $('m-keywords').textContent = (g.keywords || []).join(', ') || '—';
+  $('m-source').textContent = g.source_file || '';
+  $('m-apply').innerHTML = applyLink(g) + (g.url ? '' : `<p class="text-xs text-slate-500 mt-2">No URL was in the research files for this programme — search the exact name on the web and confirm the official site.</p>`);
+  $('modal').classList.remove('hidden');
+}
+$('m-close').addEventListener('click', () => $('modal').classList.add('hidden'));
+$('modal').addEventListener('click', e => { if (e.target.id === 'modal') $('modal').classList.add('hidden'); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') $('modal').classList.add('hidden'); });
+
+/* ================= INIT ================= */
+function initFilters(){
+  const cats = [...new Set(ALL.map(g => g.category))].sort();
+  const types = [...new Set(ALL.map(g => g.type))].sort();
+  $('f-category').innerHTML = '<option value="">All categories</option>' + cats.map(c => `<option>${esc(c)}</option>`).join('');
+  $('f-type').innerHTML = '<option value="">All types</option>' + types.map(c => `<option>${esc(c)}</option>`).join('');
+  $('category-chips').innerHTML = cats.map(c => `<button class="chip border rounded-full px-3 py-1 text-sm" data-cat="${esc(c)}">${esc(c)}</button>`).join('');
+  document.querySelectorAll('#category-chips .chip').forEach(b => b.addEventListener('click', () => {
+    const active = $('f-category').value === b.dataset.cat;
+    $('f-category').value = active ? '' : b.dataset.cat;
+    document.querySelectorAll('#category-chips .chip').forEach(x => x.classList.toggle('active', x.dataset.cat === $('f-category').value));
+    renderBrowse();
+  }));
+  $('f-category').addEventListener('change', () => {
+    document.querySelectorAll('#category-chips .chip').forEach(x => x.classList.toggle('active', x.dataset.cat === $('f-category').value));
+  });
+}
+function initStats(){
+  $('stat-total').textContent = ALL.length;
+  $('browse-total').textContent = ALL.length;
+  $('stat-india').textContent = ALL.filter(g => g.india_eligible === true).length;
+  $('stat-rolling').textContent = ALL.filter(g => g.deadline_status === 'rolling' || g.deadline_status === 'open-now').length;
+  $('stat-gems').textContent = ALL.filter(g => g.is_hidden_gem).length;
+  const dated = ALL.filter(g => g.deadline_status === 'open-now' || g.deadline_status === 'dated');
+  if (dated.length){
+    $('closing-strip').classList.remove('hidden');
+    $('closing-list').innerHTML = dated.slice(0, 20).map(g =>
+      `<button class="shrink-0 text-left bg-white border rounded-xl p-3 w-64 hover:shadow" data-id="${esc(g.id)}"><span class="font-bold text-sm line-clamp-2">${esc(g.name)}</span><span class="block text-xs text-slate-500 mt-1">${esc(g.deadline_text || '')}</span><span class="block text-sm font-bold mt-1">${esc(g.funding_text || '')}</span></button>`).join('');
+    document.querySelectorAll('#closing-list button').forEach(b => b.addEventListener('click', () => openModal(b.dataset.id)));
+  }
+}
+
+// Add-a-grant
+$('a-generate').addEventListener('click', () => {
+  const name = $('a-name').value.trim(), org = $('a-org').value.trim();
+  if (!name || !org){ alert('Please fill at least Program name and Organisation.'); return; }
+  const slug = name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,80);
+  const amt = $('a-amount').value ? Number($('a-amount').value) : null;
+  const kws = $('a-keywords').value.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+  const obj = {id: slug, name, org, category: $('a-category').value.trim() || 'General / Multi-domain',
+    type: $('a-type').value, funding_text: $('a-funding').value.trim() || 'Verify on official site',
+    funding_amount_usd: amt, funding_currency: amt != null ? 'USD' : null,
+    eligibility: $('a-elig').value.trim() || 'Verify on official site',
+    deadline_text: $('a-deadline').value.trim() || 'Verify on official site',
+    deadline_status: /rolling/i.test($('a-deadline').value) ? 'rolling' : 'unverified',
+    india_eligible: 'unknown', url: $('a-url').value.trim() || null,
+    why_easy: $('a-why').value.trim() || null, is_hidden_gem: false, is_top_pick: false, is_quick_win: false,
+    keywords: kws, source_file: 'user-submitted (verify before trusting)'};
+  const out = $('a-output'); out.textContent = JSON.stringify(obj, null, 2) + ','; out.classList.remove('hidden');
+});
+$('a-copy').addEventListener('click', async () => {
+  const t = $('a-output').textContent; if (!t) return;
+  try { await navigator.clipboard.writeText(t); $('a-copy').textContent = 'Copied ✓'; setTimeout(() => $('a-copy').textContent = 'Copy snippet', 1500); }
+  catch(e){ alert('Copy failed — select the snippet text manually.'); }
+});
+
+fetch('grants.json').then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+  .then(data => { ALL = data; initFilters(); initStats(); renderBrowse(); })
+  .catch(err => {
+    $('file-warning').classList.remove('hidden');
+    $('browse-grid').innerHTML = `<p class="bg-white border rounded-xl p-6 text-sm col-span-full">Could not load <code>grants.json</code> (${esc(err.message)}). If you opened this file directly, serve the folder instead: <code>python3 -m http.server</code> then open <code>http://localhost:8000</code>. On GitHub Pages this loads automatically.</p>`;
+  });
+</script>
+</body>
+</html>
